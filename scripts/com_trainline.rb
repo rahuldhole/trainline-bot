@@ -3,19 +3,28 @@ require 'date'
 
 class ComThetrainline
   def initialize
+    @local_settings = {
+      'DEFAULT_USER_AGENT' => 'Mac Safari',
+      'RANDOMIZE_USER_AGENT' => true,
+      'TRAINLINE_URL' => 'https://www.thetrainline.com/',
+    }.freeze
+
     @agent = Mechanize.new
-    @agent.user_agent_alias = 'Mac Safari'
-    @trainline_url = 'https://www.thetrainline.com/'
+    @agent.user_agent_alias = @local_settings['RANDOMIZE_USER_AGENT'] ? Mechanize::AGENT_ALIASES.keys.sample : @local_settings['DEFAULT_USER_AGENT']
+
+    puts "Initialized ComThetrainline"
+    puts "> user agent: #{@agent.user_agent}"
+    puts "> url: #{@local_settings['TRAINLINE_URL']}"
   end
 
   def self.find(from, to, departure_at)
-    puts "Searching for trips from #{from} to #{to} at #{departure_at}..."
     bot = ComThetrainline.new
     bot.search(from, to, departure_at)
   end
 
   def search(from, to, departure_at)
-    page = @agent.get(@trainline_url)
+    puts "Searching for trips from #{from} to #{to} at #{departure_at}..."
+    page = @agent.get(@local_settings['TRAINLINE_URL'])
 
     form = page.forms.first
     from_selector_name, to_selector_name = get_from_to_selectors(form, departure_at)
