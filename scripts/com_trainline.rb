@@ -7,15 +7,17 @@ class ComThetrainline
       'DEFAULT_USER_AGENT' => 'Mac Safari',
       'RANDOMIZE_USER_AGENT' => true,
       'TRAINLINE_URL' => 'https://www.thetrainline.com/',
+      'MAX_RETRY' => 3,
+      'RETRY_DELAY' => 10,
     }.freeze
 
     @form_fields = {
-      'from_name_selector_match_string' => 'from.search_',
-      'to_name_selector_match_string' => 'to.search_',
-      'departure_date_selector_name' => 'page.journeySearchForm.outbound.title',
-      'departure_time_selector_name' => 'hours',
-      'departure_minutes_selector_name' => 'minutes',
-      'submit_button_selector_name' => 'search',
+      'from_name_match_string' => 'from.search_',
+      'to_name_match_string' => 'to.search_',
+      'departure_date_name' => 'page.journeySearchForm.outbound.title',
+      'departure_time_name' => 'hours',
+      'departure_minutes_name' => 'minutes',
+      'submit_button_name' => 'search',
     }.freeze
 
     @agent = Mechanize.new
@@ -28,7 +30,19 @@ class ComThetrainline
 
   def self.find(from, to, departure_at)
     bot = ComThetrainline.new
-    bot.search(from, to, departure_at)
+    retry_count = 0
+    begin
+      bot.search(from, to, departure_at)
+    rescue => e
+      retry_count += 1
+      if retry_count <= @local_settings['MAX_RETRY']
+        puts "Error: #{e.message}. Retrying in #{@local_settings['RETRY_DELAY']} seconds..."
+        sleep @local_settings['RETRY_DELAY']
+        retry
+      else
+        puts "Error: #{e.message}. Max retry reached. Please try again later. Exiting..."
+      end
+    end
   end
 
   def search(from, to, departure_at)
@@ -36,27 +50,29 @@ class ComThetrainline
     page = @agent.get(@local_settings['TRAINLINE_URL'])
 
     form = page.forms.first
-    from_selector_name, to_selector_name = get_from_to_selectors(form, departure_at)
-    form[from_selector_name] = from
-    form[to_selector_name] = to
-    form[@form_fields['departure_date_selector_name']] = departure_at.strftime('%d-%b-%y')
-    form[@form_fields['departure_time_selector_name']] = departure_at.strftime('%H')
-    form[@form_fields['departure_minutes_selector_name']] = departure_at.strftime('%M')
+    raise "Form not found." if form.nil?
+
+    from_name, to_name = derive_from_to(form, departure_at)
+    form[from_name] = from
+    form[to_name] = to
+    form[@form_fields['departure_date_name']] = departure_at.strftime('%d-%b-%y')
+    form[@form_fields['departure_time_name']] = departure_at.strftime('%H')
+    form[@form_fields['departure_minutes_name']] = departure_at.strftime('%M')
 
     result_page = @agent.submit(form, form.buttons.last)
     
     puts "Submitted form... \n #{form.inspect}"
-    File.open('tmp.html', 'w') { |f| f.write(result_page.body) }
+    File.open('tmp/tmp.html', 'w') { |f| f.write(result_page.body) }
     # parse_results(result_page)
   end
 
   private 
 
-  def get_from_to_selectors(form, departure_at)
-    from_selector_name = form.fields.find { |f| f.name.start_with?(@form_fields['from_name_selector_match_string']) }.name
-    to_selector_name = form.fields.find { |f| f.name.start_with?(@form_fields['to_name_selector_match_string']) }.name
+  def derive_from_to(form, departure_at)
+    from_name = form.fields.find { |f| f.name.start_with?(@form_fields['from_name_match_string']) }.name
+    to_name = form.fields.find { |f| f.name.start_with?(@form_fields['to_name_match_string']) }.name
     
-    return from_selector_name, to_selector_name
+    return from_name, to_name
   end
 
   def parse_results(page)
