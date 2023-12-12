@@ -25,8 +25,8 @@ class ComTheTrainLine
       'RANDOMIZE_USER_AGENT' => true,
       'TRAINLINE_URL' => 'https://www.thetrainline.com/',
       'MAX_RETRY' => 3,
-      'RETRY_DELAY' => 10,
-    }.freeze
+      'RETRY_DELAY' => 15,
+    }
 
     @form_fields = {
       'from_name_match_string' => 'from.search_',
@@ -44,6 +44,17 @@ class ComTheTrainLine
     puts "> url: #{@local_settings['TRAINLINE_URL']}"
   end
 
+  def method_missing(method, *args, &block)
+    if method.to_s.end_with?('=')
+      @local_settings[method.to_s.upcase.chop] = args.first
+    elsif @local_settings.keys.include?(method.to_s.upcase)
+      @local_settings[method.to_s.upcase]
+    else
+      super
+    end
+  end
+  
+
   def new_user_agent(agent = nil)
     @agent.user_agent_alias = agent || (
       @local_settings['RANDOMIZE_USER_AGENT'] ? 
@@ -54,6 +65,7 @@ class ComTheTrainLine
   end
 
   def bot(from, to, departure_at)
+    return true
     puts "Searching for trips from #{from} to #{to} at #{departure_at}..."
     page = @agent.get(@local_settings['TRAINLINE_URL'])
 
@@ -62,9 +74,10 @@ class ComTheTrainLine
 
     form = fill_form(form, from, to, departure_at)
     result_page = @agent.submit(form, form.buttons.last)
-    
+
     puts "Submitted form... \n #{form.inspect}"
-    File.open('tmp.html', 'w') { |f| f.write(result_page.body) }
+    # File.open('form-filled.html', 'w') { |f| f.write(result_page) }
+    # File.open('form-filled.html', 'a') { |f| f.write("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n#{Time.now}") }
     # parse_results(result_page)
   end
 
@@ -93,4 +106,4 @@ class ComTheTrainLine
 end
 
 # Example
-ComTheTrainLine.find('London', 'Paris', DateTime.new(2023, 12, 26, 6, 0, 0))
+ComTheTrainLine.find('London', 'Paris', DateTime.new(2023, 12, 31, 17, 0, 0))
