@@ -17,4 +17,4 @@ COPY . .
 # CMD ["ruby", "trainline_bot.rb"]
 
 # IRB entry point
-CMD ["irb", "-I", ".", "-r", "scripts/trainline_bot.rb"]
+CMD ["irb", "-I", ".", "-r", "scripts/com_trainline.rb"]
