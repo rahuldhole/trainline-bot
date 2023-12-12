@@ -1,7 +1,7 @@
 require 'mechanize'
 require 'date'
 
-class ComThetrainline
+class ComTheTrainLine
   def initialize
     @local_settings = {
       'DEFAULT_USER_AGENT' => 'Mac Safari',
@@ -23,13 +23,13 @@ class ComThetrainline
     @agent = Mechanize.new
     @agent.user_agent_alias = @local_settings['RANDOMIZE_USER_AGENT'] ? Mechanize::AGENT_ALIASES.keys.sample : @local_settings['DEFAULT_USER_AGENT']
 
-    puts "Initialized ComThetrainline"
+    puts "Initialized ComTheTrainLine"
     puts "> user agent: #{@agent.user_agent}"
     puts "> url: #{@local_settings['TRAINLINE_URL']}"
   end
 
   def self.find(from, to, departure_at)
-    bot = ComThetrainline.new
+    bot = ComTheTrainLine.new
     retry_count = 0
     begin
       bot.search(from, to, departure_at)
@@ -82,4 +82,4 @@ class ComThetrainline
 end
 
 # Example
-ComThetrainline.find('London', 'Paris', DateTime.new(2023, 12, 26, 6, 0, 0))
+ComTheTrainLine.find('London', 'Paris', DateTime.new(2023, 12, 26, 6, 0, 0))
