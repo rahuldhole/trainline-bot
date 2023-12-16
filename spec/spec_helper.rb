@@ -1,4 +1,4 @@
-require_relative '../config.rb'
+require_relative '../config/applications.rb'
 require 'colorize'
 
 RSpec.configure do |config|
@@ -7,4 +7,3 @@ RSpec.configure do |config|
   config.formatter = :documentation
   config.include Capybara::DSL
 end
-
