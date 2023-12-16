@@ -1,0 +1,22 @@
+version: '3.0'
+services:
+  trainline-bot:
+    container_name: trainline-bot
+    image: rahuldhole/trainline-bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      CHROME_URL: http://chrome:4444/wd/hub
+    stdin_open: true
+    tty: true
+    depends_on:
+      - chrome
+    volumes:
+      - ${PWD}:/home/trainline-bot
+  chrome:
+    container_name: chrome
+    image: selenium/standalone-chrome
+    environment:
+      JAVA_OPTS: -Dwebdriver.chrome.whitelistedIps= -Dwebdriver.chrome.allowedIps=
+    shm_size: '2gb'
