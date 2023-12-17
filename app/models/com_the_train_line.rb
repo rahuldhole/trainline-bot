@@ -72,12 +72,13 @@ class ComTheTrainLine
     puts "Searching for trips from #{from} to #{to} at #{departure_at}... Please wait..."
 
     @session.visit '/'
-    loading(5)
-    puts "Landed on #{@session.title}"
+    loading(5, "Loading #{@session.title}")
 
     accept_cookies
     submit(from, to, departure_at)
     
+    loading(5, "Waiting for results")
+    screenshot("results")
     return true
   end
 
@@ -100,11 +101,13 @@ class ComTheTrainLine
 
   protected
 
-  def loading(seconds)
+  def loading(seconds, msg=nil)
+    spinner = %w[| / - \\]
     seconds.times do
-      print "\u{1f682}"
+      print "\u{1f50d} #{msg} #{spinner.rotate!.first}\r"
       sleep 1
     end
+    print "\u{1f44d} #{msg}\n"
     puts
   end
 
@@ -114,9 +117,7 @@ class ComTheTrainLine
 
   def accept_cookies
     puts "Accepting cookies"
-    # click by javascript because of overlay
     @session.execute_script("document.getElementById('#{@form_fields[:accept_cookies_button_id]}').click()")
-    # wait until overlay disappears
     wait_for_overlay_to_disappear
     screenshot("accepted_cookies")
     puts "Accepted cookies"
@@ -126,44 +127,36 @@ class ComTheTrainLine
     puts "Fill in the search form"
 
     search_form = @session.find(:css, "[data-test='#{form_fields[:fixed]['form_data_test']}']")
-    loading(1)
-    puts "Found the search form"
+    loading(1, "Found the search form")
 
     search_form.find(:css, "[id^='#{@form_fields[:variable]['from_id_match_string']}']") # from
       .set(from)
-    loading(1)
-    puts "Filled: from field"
+    loading(1, "Filled: from field")
     
     search_form.find(:css, "[id^='#{@form_fields[:variable]['to_id_match_string']}']") # to
       .set(to)
-    loading(1)
-    puts "Filled: to field"
+    loading(1, "Filled: to field")
 
     departure_date = departure_at.strftime("%d-%b-%y")
     search_form.find(:id, @form_fields[:fixed]['departure_date_id']) # departure date
       .set(departure_date)
-    loading(1)
-    puts "Filled: departure date field"
+    loading(1, "Filled: departure date field")
 
     departure_hours = departure_at.strftime("%H")
     search_form.find_all(:css, "[name='#{@form_fields[:fixed][:optional]['departure_hours_name']}']")[0]
       .set(departure_hours)
-    loading(1)
-    puts "Filled: departure hours field"
+    loading(1, "Filled: departure hours field")
 
     departure_minutes = departure_at.strftime("%M")
     search_form.find_all(:css, "[name='#{@form_fields[:fixed][:optional]['departure_minutes_name']}']")[0]
       .set(departure_minutes)
-    loading(1)
-    puts "Filled: departure minutes field"
+    loading(1, "Filled: departure minutes field")
 
     screenshot("filled_form")
 
-    # search_form.find(:css, "[data-test='#{@form_fields[:fixed]['submit_type_button_data_test']}']") # submit button
-    #   .click
-    # loading(1)
-
-    puts "Submitted the search from"
+    search_form.find(:css, "[data-test='#{@form_fields[:fixed]['submit_type_button_data_test']}']") # submit button
+      .click
+    loading(1, "Submitted the form")
   end
 
   def parse_results(page)
