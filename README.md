@@ -14,5 +14,11 @@ docker-compose down
 bundle exec rspec spec
 
 # console
-irb -I . -r config.rb
+irb
+from = "London"
+to = "Paris"
+depart_at = DateTime.new(2023, 12, 31, 17, 0, 0)
+ComTheTrainLine.find(from, to, depart_at)
+
+# ComTheTrainLine.find('London', 'Paris', DateTime.new(2023, 12, 31, 17, 0, 0))
 ~~~
