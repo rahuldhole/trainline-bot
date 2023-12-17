@@ -20,3 +20,6 @@ services:
     environment:
       JAVA_OPTS: -Dwebdriver.chrome.whitelistedIps= -Dwebdriver.chrome.allowedIps=
     shm_size: '2gb'
+    ports:
+      - '4444:4444'
+      - '5900:5900'

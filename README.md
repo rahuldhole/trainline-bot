@@ -22,3 +22,11 @@ ComTheTrainLine.find(from, to, depart_at)
 
 # ComTheTrainLine.find('London', 'Paris', DateTime.new(2023, 12, 31, 17, 0, 0))
 ~~~
+
+# Monitor
+
+VNC Viewer 
+~~~
+localhost:5900
+password: secret
+~~
