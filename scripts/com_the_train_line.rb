@@ -53,7 +53,6 @@ class ComTheTrainLine
       super
     end
   end
-  
 
   def new_user_agent(agent = nil)
     @agent.user_agent_alias = agent || (
@@ -65,7 +64,6 @@ class ComTheTrainLine
   end
 
   def bot(from, to, departure_at)
-    return true
     puts "Searching for trips from #{from} to #{to} at #{departure_at}..."
     page = @agent.get(@local_settings['TRAINLINE_URL'])
 
@@ -76,8 +74,7 @@ class ComTheTrainLine
     result_page = @agent.submit(form, form.buttons.last)
 
     puts "Submitted form... \n #{form.inspect}"
-    # File.open('form-filled.html', 'w') { |f| f.write(result_page) }
-    # File.open('form-filled.html', 'a') { |f| f.write("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n#{Time.now}") }
+    File.open('form-filled.html', 'w') { |f| f.write(result_page) }
     # parse_results(result_page)
   end
 
