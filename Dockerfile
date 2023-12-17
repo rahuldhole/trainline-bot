@@ -13,8 +13,5 @@ RUN bundle install
 # Copy the current project files to the container
 COPY . .
 
-# Load the Ruby script explicitly
-# CMD ["ruby", "trainline_bot.rb"]
-
 # IRB entry point
-CMD ["irb", "-I", ".", "-r", "scripts/com_the_train_line.rb"]
+CMD ["irb"]

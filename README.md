@@ -10,7 +10,6 @@ docker build -t trainline .
 docker run -it --rm -v "$(pwd)":/usr/src/trainline -w /usr/src/trainline trainline
 
 # In irb 
-# irb -I . -r scripts/com_the_train_line.rb
 ComTheTrainLine.find('London', 'Paris', DateTime.new(2023, 12, 31, 17, 0, 0))
 ~~~
 
