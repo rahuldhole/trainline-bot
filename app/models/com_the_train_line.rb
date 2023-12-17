@@ -43,7 +43,8 @@ class ComTheTrainLine
       }
     }.freeze
 
-    puts "Visitting #{@local_settings['url']}"
+    puts "\n\n\n Visitting #{@local_settings['url']} \n\n\n"
+
     @session = nil
     start
   end
@@ -72,7 +73,7 @@ class ComTheTrainLine
     puts "Searching for trips from #{from} to #{to} at #{departure_at}... Please wait..."
 
     @session.visit '/'
-    loading(5, "Loading #{@session.title}")
+    loading(10, "Loading #{@session.title}")
 
     accept_cookies
     submit(from, to, departure_at)
@@ -103,29 +104,22 @@ class ComTheTrainLine
 
   def loading(seconds, msg=nil)
     spinner = %w[| / - \\]
-    seconds.times do
+    (seconds * 5).times do
       print "\u{1f50d} #{msg} #{spinner.rotate!.first}\r"
-      sleep 1
+      sleep 0.2
     end
     print "\u{1f44d} #{msg}\n"
     puts
   end
 
-  def wait_for_overlay_to_disappear
-    @session.has_no_css?('.onetrust-pc-dark-filter.ot-fade-in', wait: 10)
-  end
-
   def accept_cookies
-    puts "Accepting cookies"
-    @session.execute_script("document.getElementById('#{@form_fields[:accept_cookies_button_id]}').click()")
-    wait_for_overlay_to_disappear
+    @session.execute_script("document.getElementById('#{@form_fields[:accept_cookies_button_id]}').click();")
+
+    loading(3, "Accepted cookies")
     screenshot("accepted_cookies")
-    puts "Accepted cookies"
   end
 
   def submit(from, to, departure_at)
-    puts "Fill in the search form"
-
     search_form = @session.find(:css, "[data-test='#{form_fields[:fixed]['form_data_test']}']")
     loading(1, "Found the search form")
 
