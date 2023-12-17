@@ -43,7 +43,7 @@ class ComTheTrainLine
       }
     }.freeze
 
-    puts "\n\n\n Visitting #{@local_settings['url']} \n\n\n"
+    puts "\n\n\n Visiting #{@local_settings['url']} \n\n\n"
 
     @session = nil
     start
