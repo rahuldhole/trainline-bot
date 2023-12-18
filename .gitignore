@@ -1,0 +1,15 @@
+log/*
+tmp/*
+
+
+# Bundler stuff
+.bundle/
+
+# Environment variables
+/.env
+
+.byebug_history
+.irb_history
+.irb_history_prod
+.irb_history_dev
+.irb_history_test
