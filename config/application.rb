@@ -1,6 +1,7 @@
 require 'colorize'
 require 'tty-font'
 require "tty-prompt"
+require 'date'
 
 # Define a custom font style
 font = TTY::Font.new(:doom)
@@ -23,6 +24,7 @@ puts "  ComTheTrainLine.find('London', 'Paris', DateTime.new(2023, 12, 31, 17, 0
 puts ""
 puts "Enjoy your journey with the Trainline Bot!".colorize(:blue)
 puts "------------------------------------".colorize(:blue)
+
 
 prompt = TTY::Prompt.new
 
