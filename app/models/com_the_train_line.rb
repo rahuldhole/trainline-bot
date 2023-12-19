@@ -61,36 +61,35 @@ class ComTheTrainLine
 
     puts "Searching for #{from} locations...".colorize(:yellow)
     from_location_search_response = ApiScrapper.make_plain_get_request(@locations_search_url, from_location_search_params)
-    screenshots(from_location_search_response, "#{from}_locations")
+    captures(from_location_search_response, "#{from}_locations")
     from_locations = JSON.parse(from_location_search_response)["searchLocations"]
     origin = from_locations.first["code"] # first location for any location
 
     puts "Searching for #{to} locations...".colorize(:yellow)
     to_location_search_response = ApiScrapper.make_plain_get_request(@locations_search_url, to_location_search_params)
-    screenshots(to_location_search_response, "#{to}_locations")
+    captures(to_location_search_response, "#{to}_locations")
     to_locations = JSON.parse(to_location_search_response)["searchLocations"]
     destination = to_locations.first["code"]
 
     set_transit_definition(origin, destination, departure_at)
 
     puts "Searching for journeys...".colorize(:yellow)
-    puts JSON.dump(journey_search_json)
     journey_search_response = ApiScrapper.journey_search(journey_search_json)
-    screenshots(journey_search_response, "#{from}_to_#{to}_at_#{departure_at.gsub(":", "-")}_journeys")
-    # journey_search_response = JSON.parse(journey_search_response)
+    captures(journey_search_response, "#{from}_to_#{to}_at_#{departure_at.gsub(":", "-")}_journeys")
   rescue => e
     puts "Error: #{e.message}. Please try again later. Exiting...".colorize(:red)
     return nil
   end
 
-  def screenshots(data, name=nil)
+  def captures(data, name=nil)
     return if data.nil?
 
-    name ||= "screenshot_#{Time.now.to_i}"
-    FileUtils.mkdir_p("tmp/screenshots") unless File.directory?("tmp/screenshots")
-    File.open("tmp/screenshots/#{name}.json", "w") do |f|
+    name ||= "capture_#{Time.now.to_i}"
+    FileUtils.mkdir_p("tmp/captures") unless File.directory?("tmp/captures")
+    File.open("tmp/captures/#{name}.json", "w") do |f|
       f.write(data)
     end
+    puts "Saved: tmp/captures/#{name}.json".colorize(:green)
   end
 
   private
