@@ -33,11 +33,13 @@ module ApiScrapper
         puts "Captcha URL: #{captcha_url}".colorize(:yellow)
         cookie = TTY::Prompt.new.mask("Please solve the captcha and paste the cookie here: ")
         response = journey_search_request(https, request, json_data, cookie)
-        puts "Response: #{response.body}".colorize(:yellow)
-        return response.body if response.is_a?(Net::HTTPSuccess)
-      else
-        puts "Error: #{response.body}".colorize(:red)
-        return nil
+        if response.is_a?(Net::HTTPSuccess)
+          return response.body.force_encoding('UTF-8') 
+        else
+          puts "Response: #{response.inspect}".colorize(:red)
+          puts "Journey search failed: #{response.body.force_encoding('UTF-8')}".colorize(:yellow)
+          exit
+        end
       end
     end
 

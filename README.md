@@ -15,7 +15,8 @@ ComTheTrainLine.find('London', 'Paris', DateTime.new(2023, 12, 31, 17, 0, 0))
 from = "London"
 to = "Paris"
 depart_at = DateTime.new(2023, 12, 31, 17, 0, 0)
-ComTheTrainLine.find(from, to, depart_at)
+cttl = ComTheTrainLine.new
+cttl.bot(from, to, depart_at)
 ~~~
 
 #### Custom execution options

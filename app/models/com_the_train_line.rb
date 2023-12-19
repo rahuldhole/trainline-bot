@@ -74,6 +74,7 @@ class ComTheTrainLine
     set_transit_definition(origin, destination, departure_at)
 
     puts "Searching for journeys...".colorize(:yellow)
+    puts JSON.dump(journey_search_json)
     journey_search_response = ApiScrapper.journey_search(journey_search_json)
     screenshots(journey_search_response, "#{from}_to_#{to}_at_#{departure_at.gsub(":", "-")}_journeys")
     # journey_search_response = JSON.parse(journey_search_response)
@@ -147,8 +148,8 @@ class ComTheTrainLine
   def set_transit_definition(origin, destination, departure_at)
     @transitDefinitions << {
       "direction": "outward",
-      "origin": "urn:trainline:generic:loc:#{from}",
-      "destination": "urn:trainline:generic:loc:#{to}",
+      "origin": origin,
+      "destination": destination,
       "journeyDate": {
         "type": "departAfter",
         "time": departure_at
