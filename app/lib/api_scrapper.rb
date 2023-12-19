@@ -5,19 +5,20 @@ require 'json'
 
 module ApiScrapper
   # Define a method to handle GET requests
-  def self.make_plain_get_request(base_url, params)
+  def self.make_plain_get_request(base_url, params, spinner)
     url = URI.parse("#{base_url}?#{params}")
     response = Net::HTTP.get_response(url)
 
     return response.body if response.is_a?(Net::HTTPSuccess)
 
   rescue StandardError => e
+    spinner.error
     puts "HTTP Request failed (#{e.message})".colorize(:red)
     return nil
   end
 
   # Define a method to handle POST requests
-  def self.journey_search(json_data)
+  def self.journey_search(json_data, spinners, spinner)
     url = URI("https://www.thetrainline.com/api/journey-search/")
     https = Net::HTTP.new(url.host, url.port)
     https.use_ssl = true
@@ -28,14 +29,26 @@ module ApiScrapper
     if response.code.to_i == 403
       captcha_url = "https://geo.captcha-delivery.com/captcha/"
       if response.body.include?(captcha_url)
+        @spinner4 = spinners.register("[:spinner] Solving captcha...")
+        sleep(1)
         extracted_captcha_url = response.body.match(/https:\/\/geo.captcha-delivery.com\/captcha\/.*?"/).to_s
         captcha_url = extracted_captcha_url[0..-2]
-        puts "Captcha URL: #{captcha_url}".colorize(:yellow)
+
+        puts "\nAfter solving the captcha, copy and paste the following script in your browser console to retrieve cookies:".colorize(:yellow)
+        puts "   .scripts/cookie_retrieval.js".colorize(:blue)
+        puts "Captcha URL: \n\n".colorize(:red)
+        puts captcha_url.colorize(:blue)
+        puts "\n\n\n"
         cookie = TTY::Prompt.new.mask("Please solve the captcha and paste the cookie here: ")
+        puts "Thank you! Your cookie has been successfully received.".colorize(:green)
+
         response = journey_search_request(https, request, json_data, cookie)
         if response.is_a?(Net::HTTPSuccess)
+          @spinner4.success
           return response.body.force_encoding('UTF-8') 
         else
+          @spinner4.error
+          spinner.error
           puts "Response: #{response.inspect}".colorize(:red)
           puts "Journey search failed: #{response.body.force_encoding('UTF-8')}".colorize(:yellow)
           exit
@@ -44,6 +57,7 @@ module ApiScrapper
     end
 
   rescue StandardError => e
+    spinner.error
     puts "HTTP Request failed (#{e.message})".colorize(:red)
     return nil
   end

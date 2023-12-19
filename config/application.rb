@@ -1,6 +1,7 @@
 require 'colorize'
 require 'tty-font'
 require "tty-prompt"
+require 'tty-spinner'
 require 'date'
 
 # Define a custom font style

@@ -35,6 +35,11 @@ class ComTheTrainLine
     @directSearch = false
     @composition = false
     set_dummy_journey_search_data
+
+    @spinners = TTY::Spinner::Multi.new("[:spinner] The Trainline jounrey search bot is running...")
+    @spinner1 = nil
+    @spinner2 = nil
+    @spinner3 = nil
   end
 
   def journey_search_json
@@ -59,22 +64,32 @@ class ComTheTrainLine
     from_location_search_params = to_location_search_params(from)
     to_location_search_params = to_location_search_params(to)
 
-    puts "Searching for #{from} locations...".colorize(:yellow)
-    from_location_search_response = ApiScrapper.make_plain_get_request(@locations_search_url, from_location_search_params)
+    # puts "Searching for #{from} locations...".colorize(:yellow)
+    @spinner1 = @spinners.register("[:spinner] Searching for #{from} locations...")
+    @spinner1.auto_spin
+    from_location_search_response = ApiScrapper.make_plain_get_request(@locations_search_url, from_location_search_params, @spinner1)
     captures(from_location_search_response, "#{from}_locations")
     from_locations = JSON.parse(from_location_search_response)["searchLocations"]
     origin = from_locations.first["code"] # first location for any location
+    @spinner1.success
 
-    puts "Searching for #{to} locations...".colorize(:yellow)
-    to_location_search_response = ApiScrapper.make_plain_get_request(@locations_search_url, to_location_search_params)
+
+    # puts "Searching for #{to} locations...".colorize(:yellow)
+    @spinner2 = @spinners.register("[:spinner] Searching for #{to} locations...")
+    @spinner2.auto_spin
+    to_location_search_response = ApiScrapper.make_plain_get_request(@locations_search_url, to_location_search_params, @spinner2)
     captures(to_location_search_response, "#{to}_locations")
     to_locations = JSON.parse(to_location_search_response)["searchLocations"]
     destination = to_locations.first["code"]
+    @spinner2.success
 
     set_transit_definition(origin, destination, departure_at)
 
-    puts "Searching for journeys...".colorize(:yellow)
-    journey_search_response = ApiScrapper.journey_search(journey_search_json)
+    # puts "Searching for journeys...".colorize(:yellow)
+    @spinner3 = @spinners.register("[:spinner] Searching for journeys from #{from} to #{to} at #{departure_at}...")
+    @spinner3.auto_spin
+    journey_search_response = ApiScrapper.journey_search(journey_search_json, @spinners, @spinner3)
+    @spinner3.success
     captures(journey_search_response, "#{from}_to_#{to}_at_#{departure_at.gsub(":", "-")}_journeys")
   rescue => e
     puts "Error: #{e.message}. Please try again later. Exiting...".colorize(:red)
