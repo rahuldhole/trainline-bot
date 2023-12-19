@@ -1,3 +1,8 @@
+### Demo
+
+![Demo](demo/trainline-bot-example.gif)
+
+
 ### Installation
 
 ~~~
