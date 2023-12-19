@@ -24,7 +24,6 @@ class ComTheTrainLine
     set_fixed_locations_search_data
 
     # Journey Search
-    @journey_search_url = "https://www.thetrainline.com/api/journey-search/"
     @passengers = []
     @isEurope = false
     @cards = []
@@ -66,7 +65,6 @@ class ComTheTrainLine
     from_locations = JSON.parse(from_location_search_response)["searchLocations"]
     origin = from_locations.first["code"] # first location for any location
 
-
     puts "Searching for #{to} locations...".colorize(:yellow)
     to_location_search_response = ApiScrapper.make_plain_get_request(@locations_search_url, to_location_search_params)
     screenshots(to_location_search_response, "#{to}_locations")
@@ -75,10 +73,10 @@ class ComTheTrainLine
 
     set_transit_definition(origin, destination, departure_at)
 
-    # puts "Searching for journeys...".colorize(:yellow)
-    # journey_search_response = ApiScrapper.make_json_post_request(@journey_search_url, journey_search_json)
-    # screenshots(journey_search_response, "#{from}_to_#{to}_at_#{departure_at.gsub(":", "-")}_journeys")
-    # # journey_search_response = JSON.parse(journey_search_response)
+    puts "Searching for journeys...".colorize(:yellow)
+    journey_search_response = ApiScrapper.journey_search(journey_search_json)
+    screenshots(journey_search_response, "#{from}_to_#{to}_at_#{departure_at.gsub(":", "-")}_journeys")
+    # journey_search_response = JSON.parse(journey_search_response)
   rescue => e
     puts "Error: #{e.message}. Please try again later. Exiting...".colorize(:red)
     return nil
