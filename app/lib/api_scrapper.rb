@@ -44,6 +44,7 @@ module ApiScrapper
 
         response = journey_search_request(https, request, json_data, cookie)
         if response.is_a?(Net::HTTPSuccess)
+          File.open(".datadome_cookies", "w") { |file| file.write(cookie) }
           @spinner4.success
           return response.body.force_encoding('UTF-8') 
         else
@@ -74,8 +75,8 @@ module ApiScrapper
     request["Sec-Fetch-Mode"] = "cors"
     request["Sec-Fetch-Dest"] = "empty"
     request["host"] = "www.thetrainline.com"
-    request["Cookie"] = "datadome=~ZK_3QCGsXo29f5XPte52aDLl6ojnqRcv0Wl_AxudX1XZJCrMhrdrUgm9ScBe5~laNezVrCokoOhrmPIsO10EtFMTsyjycy5FMRm8gUhGDmZ3dDnPE8Z46~vB5BEcmA2; context_id=0bb1f012-bfc4-4288-9795-bce6654c57ea; pdt=ff8561d5-62cc-4e51-8289-dedb27d37919"
-    request["Cookie"] = cookie if cookie
+    request["Cookie"] = cookie || File.read(".datadome_cookies") rescue nil
+
     request.body = json_data
     return https.request(request)
   end

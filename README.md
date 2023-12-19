@@ -17,10 +17,9 @@ docker build -t trainline .
 docker run -it --rm -v "$(pwd)":/usr/src/trainline -w /usr/src/trainline trainline
 ~~~
 
-
 ### Examples
 
-At the first time of execution it may ask you to verify a DataDome captcha. Once verified you may use `ComTheTrainLine.find` for one year without any problem.
+During the initial execution, you might encounter a DataDome captcha verification prompt. Once successfully verified, you should ideally be able to utilize ComTheTrainLine.find without any interruptions for a year. However, there's a possibility that it may prompt you for reverification if it detects any suspicious activity.
 
 #### Example 1
 
@@ -38,3 +37,5 @@ cttl = ComTheTrainLine.new
 cttl.bot(from, to, depart_at)
 ~~~
 
+### Cookie Management (Optional)
+You may read/write the datadome cookie in `.datadome_cookies` under root folder of the project
